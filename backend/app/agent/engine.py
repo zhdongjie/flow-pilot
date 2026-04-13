@@ -5,10 +5,7 @@ from typing import Any
 
 import yaml
 
-try:
-    from app.schemas.task_schema import validate_task
-except ImportError:  # pragma: no cover - supports direct CLI execution
-    from schemas.task_schema import validate_task
+from app.schemas.task_schema import validate_task
 
 
 TASK_DIR = Path(__file__).resolve().parent.parent / "kb" / "tasks"

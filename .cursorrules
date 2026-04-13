@@ -1,4 +1,4 @@
-# 🧠 FlowPilot - Cursor Rules (FULL VERSION)
+# 🧠 FlowPilot - Cursor Rules (FINAL VERSION V1.6)
 
 ## 🎯 Project Mission
 
@@ -8,7 +8,9 @@ The system must:
 
 * Understand user intent
 * Map to a predefined workflow
+* Detect current UI state
 * Guide the user step-by-step
+* Highlight UI elements
 * Simulate real system operation guidance
 
 ---
@@ -18,6 +20,7 @@ The system must:
 This project is:
 
 ✅ A step-by-step operation guidance engine
+✅ A UI-aware navigation assistant
 ❌ NOT a chatbot
 ❌ NOT a RAG system
 ❌ NOT a general AI assistant
@@ -48,6 +51,7 @@ This project is:
 3. **Explicit > Abstract**
 4. **Hardcode > Over-engineering**
 5. **MVP > Platform**
+6. **UI Reality > Assumptions**
 
 ---
 
@@ -58,7 +62,7 @@ The system must follow this pipeline:
 User Input
 → Intent Detection (rule-based)
 → Load YAML Task
-→ Step Engine (based on state)
+→ Step Engine (UI-aware)
 → Response Generator
 
 ---
@@ -70,8 +74,53 @@ The system must:
 1. Accept user input (text)
 2. Detect intent using RULE-BASED logic ONLY
 3. Load corresponding YAML workflow
-4. Determine current step based on UI state
-5. Return next actionable step
+4. Read current UI state (`current_page`)
+5. Determine:
+
+   * Continue current flow
+   * OR perform path recovery
+6. Return:
+
+   * Full workflow
+   * Next actionable step
+   * UI highlight target
+
+---
+
+## 🔥 UI-Aware Capability (NEW)
+
+### 1️⃣ Route Awareness
+
+System MUST:
+
+* Use `current_page`
+* Match it with workflow steps
+* NEVER ignore UI state
+
+---
+
+### 2️⃣ Path Recovery (CRITICAL)
+
+DO NOT restart flow blindly.
+
+Instead:
+
+```text
+IF current_page matches a step:
+    continue to next step
+ELSE:
+    find closest valid step
+    guide user to that step
+```
+
+---
+
+### 3️⃣ No Hard Reset Rule
+
+DO NOT:
+
+* Force user back to step 1
+* Restart workflow unnecessarily
 
 ---
 
@@ -89,7 +138,7 @@ The system must:
 
 ---
 
-## 📚 YAML Workflow Rules
+## 📚 YAML Workflow Rules (UPDATED)
 
 YAML must follow STRICT structure:
 
@@ -102,8 +151,12 @@ steps:
   - step: number
     page: string (optional)
     action: string (optional)
+    desc: string (optional)
+    highlight: string (optional)
     form: (optional)
 ```
+
+---
 
 ### Rules:
 
@@ -119,7 +172,7 @@ steps:
 
 ### General
 
-* Use Poetry ONLY (no pip / requirements.txt)
+* Use Poetry ONLY
 * Keep files small (<200 lines)
 * Prefer functions over classes
 * Avoid deep abstractions
@@ -130,10 +183,10 @@ steps:
 
 ```
 agent/
-  intent.py      # intent detection
-  engine.py      # step logic
-  state.py       # UI state handling
-  responder.py   # output formatting
+  intent.py
+  engine.py
+  state.py
+  responder.py
 ```
 
 ---
@@ -141,9 +194,9 @@ agent/
 ### Coding Rules
 
 * No unnecessary classes
-* No dependency injection frameworks
-* No design patterns unless absolutely necessary
+* No frameworks
 * Use plain Python
+* Keep logic explicit
 
 ---
 
@@ -153,23 +206,23 @@ agent/
 * DO NOT use AI / LLM
 * Use simple keyword matching
 
-Example:
-
-```python
-if "开卡" in text:
-    return "open_account"
-```
-
 ---
 
-## 🔄 Step Engine Rules
+## 🔄 Step Engine Rules (UPGRADED)
 
-* Must be deterministic
-* Must not hallucinate
-* Must rely ONLY on:
+Engine MUST:
+
+* Be deterministic
+* Use ONLY:
 
   * YAML
   * current state
+
+### Must support:
+
+1. Step matching（当前页面匹配）
+2. Path recovery（路径纠正）
+3. Next step calculation（下一步判断）
 
 ---
 
@@ -191,13 +244,31 @@ Rules:
 
 ---
 
+## 🎯 Backend → Frontend Contract (NEW)
+
+Backend MUST return:
+
+```json
+{
+  "message": "点击【开户】",
+  "highlight": "btn_open_account",
+  "step": 2,
+  "workflow": [...],
+  "reason": "这是开户流程的下一步"
+}
+```
+
+---
+
 ## 🗣️ Response Rules (CRITICAL)
 
 Responses must:
 
 ✅ Be actionable
 ✅ Be step-by-step
-✅ Tell user EXACTLY what to do
+✅ Include full workflow
+✅ Include next step
+✅ Include highlight target
 
 ---
 
@@ -205,62 +276,72 @@ Responses must:
 
 👉 当前页面：客户管理
 
-建议下一步：
+完整流程：
+
+1. 进入【客户管理】
+2. 点击【开户】
+3. 填写客户信息
+4. 点击【提交申请】
+
+👉 建议下一步：
 点击【开户】
 
-原因：
+👉 高亮：btn_open_account
+
+👉 原因：
 这是开户流程的下一步
 
 ---
 
 ### Bad Example
 
-❌ “你可以去开户页面完成操作”
-❌ “系统支持开户功能”
+❌ 模糊描述
+❌ 纯说明文档
+❌ 没有操作指引
 
 ---
 
-## 🎨 Frontend Rules
+## 🎨 Frontend Rules (UPDATED)
 
 ### MUST
 
-* Use Vue3 Composition API
-* Keep UI minimal
-* Single main component: ChatPanel
+* Vue3 Composition API
+* ChatPanel only
+* Floating customer service widget
 
 ---
 
 ### UI Requirements
 
-* Input box (user message)
-* Display response
-* Display current step
-* Display current page (optional)
+* Simulated bank UI（首页 / 客户 / 开户）
+* Chat is floating (外挂)
+* No blocking UI
+* Highlight UI element based on `highlight`
 
 ---
 
-### DO NOT
+### Highlight Rules
 
-* Use complex UI frameworks
-* Build dashboard systems
-* Add unnecessary components
+* Use `data-id` or `ref`
+* Must match backend `highlight`
 
 ---
 
 ## 🔄 Development Workflow (STRICT ORDER)
 
-1. Build CLI version FIRST
-2. Validate logic works
-3. Build FastAPI endpoint
-4. THEN build Vue frontend
+1. Validate backend logic
+2. Implement step engine
+3. Implement path recovery
+4. Implement highlight support
+5. Connect frontend
 
 ---
 
 ## 🧪 Testing Rules
 
 * Test intent detection
-* Test step engine
-* At least 1 test per module
+* Test step matching
+* Test path recovery
 
 ---
 
@@ -282,7 +363,6 @@ DO NOT:
 * Create generic frameworks
 * Abstract future features
 * Add plugin systems
-* Build reusable engines
 
 ---
 
@@ -291,7 +371,8 @@ DO NOT:
 ONLY build:
 
 * Open Account workflow
-* Basic step guidance
+* UI guidance
+* Highlight + path recovery
 
 STOP after MVP works.
 
@@ -299,9 +380,12 @@ STOP after MVP works.
 
 ## 🔥 Final Principle
 
-You are NOT building a platform.
+You are building:
 
-You are building a **working demo in the shortest time possible**.
+👉 A **UI-aware training assistant**
+
+NOT a platform
+NOT an AI system
 
 ---
 
@@ -310,8 +394,10 @@ You are building a **working demo in the shortest time possible**.
 The project is successful if:
 
 * User inputs: “我要开卡”
-* System responds with correct next step
-* Guidance feels like a human trainer
+* System returns full workflow
+* System highlights correct UI
+* System adapts to current page
+* User can complete flow without confusion
 
 ---
 

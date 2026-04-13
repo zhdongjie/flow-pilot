@@ -1,120 +1,86 @@
-# 🧠 FlowPilot - MVP PLAN (FULL VERSION)
+# 🧠 FlowPilot - V1.5 PLAN (UI-Aware Guided Flow)
 
 ---
 
-## 🎯 Project Goal
+## 🎯 Goal
 
-Build a **minimal working demo** of an AI system that:
+Build a system that:
 
-> Accepts user input → Understands intent → Guides user step-by-step through a system operation
-
----
-
-## 🧪 Demo Scope (STRICT)
-
-Only implement:
-
-### ✅ MUST HAVE
-
-* Open Account (开户流程)
-
-### ⚠️ OPTIONAL
-
-* Transfer (转账流程)
+> Understands user intent + detects current UI state + guides user step-by-step with UI highlights
 
 ---
 
-## ❌ Out of Scope (DO NOT BUILD)
+## 🔥 Core Experience
 
-* No generic workflow engine
-* No AI reasoning system
-* No RAG / knowledge base
-* No OpenAPI integration
-* No automation / execution engine
+User says:
 
----
+👉 我要开户
 
-## ⚙️ Tech Stack (MANDATORY)
+System does:
 
-### Backend
+1. Detect intent → open_account
+2. Check current page
+3. Decide:
 
-* Python == 3.11.9
-* Poetry (dependency management)
-* FastAPI
-
-### Frontend
-
-* Vue 3
-* Vite
-* Composition API
+   * continue flow OR
+   * guide to correct entry point
+4. Highlight UI element
+5. Show instruction
 
 ---
 
-## 🏗️ System Architecture (FIXED)
+## 🧠 Core Capability (NEW)
 
-User Input
-→ Intent Detection (rule-based)
-→ Load YAML Task
-→ Step Engine (based on state)
-→ Response Generator
+### 1️⃣ Route Awareness
+
+System must:
+
+* Read `current_page`
+* Match with workflow steps
 
 ---
 
-## 📦 Project Structure
+### 2️⃣ Path Recovery (CRITICAL)
+
+Logic:
 
 ```
-project/
-├── backend/
-│   ├── app/
-│   │   ├── main.py
-│   │   ├── agent/
-│   │   │   ├── intent.py
-│   │   │   ├── engine.py
-│   │   │   ├── state.py
-│   │   │   └── responder.py
-│   │   ├── kb/
-│   │   │   └── tasks/
-│   │   │       └── open_account.yaml
-│   │   └── schemas/
-│   │       └── task_schema.py
-│   │
-│   ├── pyproject.toml
-│   └── poetry.lock
-│
-├── frontend/
-│   ├── src/
-│   │   ├── App.vue
-│   │   ├── components/
-│   │   │   └── ChatPanel.vue
-│   │   └── api/
-│   │       └── chat.ts
-│   │
-│   ├── package.json
-│   └── vite.config.ts
-│
-├── PLAN.md
-└── .cursorrules
+IF current_page in workflow:
+    continue to next step
+ELSE:
+    find closest valid step
+    guide user to it
 ```
 
 ---
 
-## 📚 Data Design (YAML Workflow)
+### 3️⃣ UI Highlighting
 
-### File: `open_account.yaml`
+Each step must support:
+
+* highlight target (button / menu)
+* instruction text
+
+---
+
+## 📚 YAML Upgrade (IMPORTANT)
 
 ```yaml
 task:
   id: open_account
-  name: 开户流程
 
 steps:
   - step: 1
     page: /home
     action: 进入客户管理
+    highlight: menu_customer
+    desc: 点击客户管理进入客户模块
 
   - step: 2
     page: /customer
     action: 点击开户按钮
+    highlight: btn_open_account
+    desc: 点击开户创建新账户
 
   - step: 3
     page: /customer/create
@@ -123,261 +89,106 @@ steps:
         desc: 客户姓名
       - field: riskLevel
         desc: 风险等级
-
-  - step: 4
-    action: 点击提交
 ```
 
 ---
 
-## 🧠 Module Design
+## 🧠 Engine Logic (UPGRADE)
 
----
-
-### 1️⃣ intent.py
-
-Purpose:
-
-* Detect user intent
-
-Rules:
-
-* MUST be rule-based
-* NO AI usage
-
-Example:
-
-```python
-def detect_intent(text: str) -> str:
-    if "开卡" in text or "开户" in text:
-        return "open_account"
-    return "unknown"
-```
-
----
-
-### 2️⃣ state.py
-
-Purpose:
-
-* Represent current UI state
-
-Example:
-
-```python
-def get_state():
-    return {
-        "current_page": "/customer"
-    }
-```
-
----
-
-### 3️⃣ engine.py
-
-Purpose:
-
-* Determine next step
-
-Logic:
-
-* Compare current_page with steps
-* Return next actionable step
-
----
-
-### 4️⃣ responder.py
-
-Purpose:
-
-* Format output for user
-
-Rules:
-
-* Must be actionable
-* Must be step-by-step
-
-Example Output:
-
-👉 当前页面：客户管理
-
-建议下一步：
-点击【开户】
-
-原因：
-这是开户流程的下一步
-
----
-
-## 🚀 Backend API (FastAPI)
-
-### Endpoint
-
-POST `/chat`
-
----
-
-### Request
+### Input
 
 ```json
 {
-  "message": "我要开卡",
-  "state": {
-    "current_page": "/customer"
-  }
+  "message": "我要开户",
+  "current_page": "/unknown"
 }
 ```
 
 ---
 
-### Response
+### Output Decision
+
+1. detect intent
+2. load workflow
+3. find current step
+
+---
+
+### Step Matching Logic
+
+```python
+if current_page in step_pages:
+    return next_step
+else:
+    return first_reachable_step
+```
+
+---
+
+## 🖥️ Frontend Requirement (NEW)
+
+Frontend must support:
+
+* receive `highlight` field
+* visually highlight UI element
+* show instruction popup
+
+---
+
+## 🔄 Response Format (UPDATED)
 
 ```json
 {
-  "reply": "text guidance",
-  "next_step": {
-    "step": 2,
-    "action": "点击开户按钮"
-  }
+  "message": "点击【客户管理】",
+  "highlight": "menu_customer",
+  "reason": "这是开户流程入口"
 }
 ```
 
 ---
 
-## 💻 CLI Mode (FIRST IMPLEMENTATION)
+## 🧪 Demo Scenario
 
-Before frontend:
+Case 1:
 
-```bash
-python main.py
-```
+User at `/home`
+→ highlight 客户管理
 
-Example:
+Case 2:
 
-```
-输入：我要开卡
-输出：下一步操作
-```
+User at `/customer`
+→ highlight 开户按钮
 
----
+Case 3:
 
-## 🎨 Frontend Design (Vue3)
-
-### Component: ChatPanel.vue
-
-Must include:
-
-* Input box
-* Submit button
-* Response display
-* Current step display
+User at wrong page
+→ guide to nearest step
 
 ---
 
-### API Call
+## 🚫 Still NOT Allowed
 
-`POST /chat`
-
----
-
-## 🔄 Development Steps (STRICT ORDER)
-
----
-
-### Step 1
-
-* Create Poetry project
-* Setup FastAPI
-
----
-
-### Step 2
-
-* Implement intent detection
-
----
-
-### Step 3
-
-* Create YAML workflow
-
----
-
-### Step 4
-
-* Implement step engine
-
----
-
-### Step 5
-
-* Implement CLI demo
-
----
-
-### Step 6
-
-* Add FastAPI endpoint
-
----
-
-### Step 7
-
-* Build Vue3 UI
-
----
-
-## 🧪 Testing Requirements
-
-* Test intent detection
-* Test step engine
-* Ensure correct step output
+* No OpenAPI
+* No AI reasoning
+* No dynamic planning
 
 ---
 
 ## ✅ Success Criteria
 
-The demo is successful if:
-
-1. User enters: “我要开卡”
-2. System detects intent correctly
-3. System returns correct next step
-4. Output is actionable
-5. Feels like human guidance
+* System adapts to current page
+* System highlights correct UI
+* System does NOT restart blindly
+* Feels like real training assistant
 
 ---
 
-## 🚫 Anti-Scope Rules
+## 🔥 Key Upgrade
 
-DO NOT:
+From:
 
-* Build reusable framework
-* Add abstraction layers
-* Introduce AI/LLM
-* Optimize for scalability
-* Implement future features
+👉 Static step output
 
----
+To:
 
-## 🔥 Final Principle
-
-> Build the simplest system that works.
-
----
-
-## 🧭 Completion Definition
-
-Project is DONE when:
-
-* CLI works
-* API works
-* UI works
-* Workflow is correct
-
----
-
-## 🧨 Absolute Rule
-
-If a feature is not required for MVP:
-
-👉 DO NOT BUILD IT
+👉 Context-aware UI guidance

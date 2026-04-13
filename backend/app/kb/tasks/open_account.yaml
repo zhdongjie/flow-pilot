@@ -1,23 +1,32 @@
 ﻿task:
   id: open_account
-  name: 开户流程
+  name: 开户申请流程
 
 steps:
   - step: 1
     page: /home
-    action: 进入客户管理
+    action: 完成登录进入客户服务中心
 
   - step: 2
     page: /customer
-    action: 点击开户按钮
+    action: 进入开户申请
 
   - step: 3
     page: /customer/create
     form:
       - field: name
         desc: 客户姓名
+      - field: idCard
+        desc: 身份证号
+      - field: phone
+        desc: 联系电话
       - field: riskLevel
         desc: 风险等级
+      - field: address
+        desc: 开户地址
+      - field: note
+        desc: 备注
 
   - step: 4
-    action: 点击提交
+    page: /customer/create
+    action: 点击提交申请

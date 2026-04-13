@@ -1,26 +1,19 @@
 # =========================
 # 1. 环境与配置文件
 # =========================
+.env
 .env.*
-
-!.env
+!.env.example
 !.env.*.example
 
 # =========================
-# 2. 数据库与业务数据
-# =========================
-# ChromaDB 向量数据库持久化目录
-data/chroma_data/
-docker/data/
-
-# =========================
-# 3. 日志文件
+# 2. 日志文件
 # =========================
 logs/
 *.log
 
 # =========================
-# 4. Python 缓存与虚拟环境
+# 3. Python 缓存与虚拟环境
 # =========================
 __pycache__/
 *.py[cod]
@@ -33,8 +26,11 @@ __pycache__/
 venv/
 env/
 ENV/
+
+# =========================
+# 4. Python 构建与包产物
+# =========================
 build/
-develop-eggs/
 dist/
 downloads/
 eggs/
@@ -48,7 +44,18 @@ wheels/
 *.egg
 
 # =========================
-# 5. IDE 与编辑器配置文件
+# 5. 前端构建与依赖
+# =========================
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# 6. IDE 与编辑器配置文件
 # =========================
 .idea/
 .vscode/
@@ -59,7 +66,7 @@ wheels/
 .ropeproject
 
 # =========================
-# 6. 操作系统生成文件
+# 7. 操作系统生成文件
 # =========================
 .DS_Store
 .DS_Store?
@@ -70,7 +77,7 @@ ehthumbs.db
 Thumbs.db
 
 # =========================
-# 7. 测试与覆盖率报告
+# 8. 测试与覆盖率报告
 # =========================
 .pytest_cache/
 .tox/
@@ -78,9 +85,5 @@ htmlcov/
 .coverage
 .coverage.*
 coverage.xml
-
-# =========================
-# 8. Retrieval eval outputs
-# =========================
-resource/evals/*.json
-!resource/evals/*.jsonl
+.mypy_cache/
+.ruff_cache/

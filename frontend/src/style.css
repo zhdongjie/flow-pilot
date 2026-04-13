@@ -1,0 +1,476 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&family=Playfair+Display:wght@600&display=swap");
+
+:root {
+  color-scheme: light;
+  font-family: "Manrope", "Noto Sans SC", "PingFang SC", sans-serif;
+  --bg: #f3f4f7;
+  --bg-deep: #e7edf6;
+  --ink: #101318;
+  --muted: #5b6574;
+  --brand: #0c5b4c;
+  --brand-dark: #083f34;
+  --accent: #f1b256;
+  --card: #ffffff;
+  --border: #e2e6ee;
+  --shadow: 0 20px 60px rgba(13, 25, 40, 0.12);
+  --radius: 22px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle at top, #ffffff 0%, var(--bg) 48%, var(--bg-deep) 100%);
+  color: var(--ink);
+  padding: 32px;
+}
+
+#app {
+  width: min(1200px, 100%);
+  margin: 0 auto;
+}
+
+.bank-shell {
+  display: grid;
+  gap: 24px;
+  position: relative;
+}
+
+.bank-header {
+  background: linear-gradient(135deg, #0f2f2a, #102f4f);
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 24px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  box-shadow: var(--shadow);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.brand-mark {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--accent), #f8d89c);
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: #1e1f23;
+}
+
+.brand-name {
+  margin: 0;
+  font-family: "Playfair Display", serif;
+  font-size: 22px;
+}
+
+.brand-tag {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #d7dde9;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-pill {
+  background: rgba(255, 255, 255, 0.18);
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+.ghost {
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--ink);
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.bank-header .ghost {
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: transparent;
+  color: #fff;
+}
+
+.bank-body {
+  display: block;
+}
+
+.bank-main {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.page-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.tab {
+  border: 1px solid var(--border);
+  background: #f7f8fb;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.tab.active {
+  background: var(--brand);
+  color: #fff;
+  border-color: transparent;
+}
+
+.page-screen {
+  background: #f9fafc;
+  border-radius: 18px;
+  padding: 20px;
+  border: 1px dashed #d5dbe6;
+  overflow: hidden;
+}
+
+.page {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 2fr 1fr;
+}
+
+.panel {
+  background: #fff;
+  border-radius: 18px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  display: grid;
+  gap: 14px;
+}
+
+.panel h2 {
+  margin: 0;
+}
+
+.panel p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.panel.wide {
+  grid-column: span 2;
+}
+
+.info-panel {
+  background: #f1f5fb;
+  border-radius: 16px;
+  padding: 16px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.info-panel ul {
+  margin: 8px 0 0;
+  padding-left: 16px;
+  display: grid;
+  gap: 6px;
+}
+
+.form-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.form-grid label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.form-grid input,
+.form-grid select,
+.form-grid textarea {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 14px;
+  background: #fbfcfe;
+}
+
+.form-grid.dense {
+  margin-top: 8px;
+}
+
+.form-grid .full {
+  grid-column: span 2;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.action-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.inline-status {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.primary {
+  background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+  color: #fff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.menu-item {
+  border: 1px solid var(--border);
+  padding: 12px;
+  border-radius: 14px;
+  background: #fff;
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.menu-item p {
+  margin: 0;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.menu-item:hover {
+  border-color: var(--brand);
+  transform: translateY(-1px);
+}
+
+.menu-item.active {
+  border-color: var(--brand);
+  background: #f0f7f5;
+}
+
+
+.chat-fab {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  background: linear-gradient(135deg, var(--brand), var(--brand-dark));
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 14px 30px rgba(9, 40, 33, 0.3);
+}
+
+.chat-window {
+  width: min(380px, 100%);
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+
+.chat-window.floating {
+  position: fixed;
+  right: 24px;
+  bottom: 80px;
+  z-index: 20;
+}
+
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.chat-subtitle {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.icon {
+  border: none;
+  background: #f1f3f7;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.chat-body {
+  background: #f6f7fb;
+  border-radius: 16px;
+  padding: 12px;
+  height: 280px;
+  overflow-y: auto;
+  display: grid;
+  gap: 12px;
+}
+
+.chat-bubble {
+  background: #fff;
+  padding: 10px 12px;
+  border-radius: 14px;
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--ink);
+  border: 1px solid #e6eaf0;
+}
+
+.chat-bubble.user {
+  background: #102f4f;
+  color: #fff;
+  border-color: transparent;
+  justify-self: end;
+}
+
+.chat-bubble .role {
+  font-size: 11px;
+  color: inherit;
+  opacity: 0.7;
+}
+
+.chat-input {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-input input {
+  flex: 1;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+}
+
+.chat-input button {
+  border: none;
+  background: var(--brand);
+  color: #fff;
+  border-radius: 12px;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
+.chat-footnote {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.chat-error {
+  margin: 0;
+  font-size: 12px;
+  color: #b23a2a;
+}
+
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.page-enter-from {
+  opacity: 0;
+  transform: translateX(16px);
+}
+
+.page-leave-to {
+  opacity: 0;
+  transform: translateX(-16px);
+}
+
+.chat-enter-active,
+.chat-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.chat-enter-from,
+.chat-leave-to {
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+@media (max-width: 980px) {
+  .page {
+    grid-template-columns: 1fr;
+  }
+
+  .panel.wide {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 640px) {
+  body {
+    padding: 18px;
+  }
+
+  .bank-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-grid .full {
+    grid-column: span 1;
+  }
+
+  .chat-window.floating {
+    right: 12px;
+    left: 12px;
+    width: auto;
+  }
+}

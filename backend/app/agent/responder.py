@@ -28,8 +28,21 @@ def _build_action_text(step: dict[str, Any]) -> str:
     return "执行下一步操作"
 
 
-def format_reply(step: dict[str, Any] | None, state: dict[str, Any] | None) -> str:
-    if step is None:
+def _format_step_line(step: dict[str, Any]) -> str:
+    action_text = _build_action_text(step)
+    page = step.get("page")
+    if isinstance(page, str) and page.strip():
+        return f"{action_text}（{page}）"
+    return action_text
+
+
+def format_reply(
+    task: dict[str, Any],
+    step: dict[str, Any] | None,
+    state: dict[str, Any] | None,
+) -> str:
+    steps = task.get("steps") or []
+    if not steps or step is None:
         return "未找到可执行步骤。"
 
     current_page = "未知"
@@ -40,8 +53,21 @@ def format_reply(step: dict[str, Any] | None, state: dict[str, Any] | None) -> s
 
     action_text = _build_action_text(step)
 
+    step_lines: list[str] = []
+    for item in steps:
+        if not isinstance(item, dict):
+            continue
+        step_no = item.get("step")
+        if isinstance(step_no, int):
+            step_lines.append(f"{step_no}. {_format_step_line(item)}")
+        else:
+            step_lines.append(f"- {_format_step_line(item)}")
+
     lines = [
         f"当前页面：{current_page}",
+        "",
+        "完整流程：",
+        *step_lines,
         "",
         "建议下一步：",
         action_text,
