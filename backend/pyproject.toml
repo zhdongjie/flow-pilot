@@ -1,0 +1,15 @@
+﻿[tool.poetry]
+name = "flow-pilot"
+version = "0.1.0"
+description = "FlowPilot MVP"
+authors = ["FlowPilot Team"]
+packages = [{ include = "app" }]
+
+[tool.poetry.dependencies]
+python = "3.11.9"
+fastapi = "^0.110.0"
+pyyaml = "^6.0.1"
+
+[build-system]
+requires = ["poetry-core>=1.9.0"]
+build-backend = "poetry.core.masonry.api"

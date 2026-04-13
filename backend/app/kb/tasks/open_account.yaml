@@ -1,0 +1,23 @@
+﻿task:
+  id: open_account
+  name: 开户流程
+
+steps:
+  - step: 1
+    page: /home
+    action: 进入客户管理
+
+  - step: 2
+    page: /customer
+    action: 点击开户按钮
+
+  - step: 3
+    page: /customer/create
+    form:
+      - field: name
+        desc: 客户姓名
+      - field: riskLevel
+        desc: 风险等级
+
+  - step: 4
+    action: 点击提交

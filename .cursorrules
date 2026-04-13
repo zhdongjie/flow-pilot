@@ -1,0 +1,322 @@
+# 🧠 FlowPilot - Cursor Rules (FULL VERSION)
+
+## 🎯 Project Mission
+
+Build a **minimal, working MVP** of an AI system that guides users step-by-step through software operations.
+
+The system must:
+
+* Understand user intent
+* Map to a predefined workflow
+* Guide the user step-by-step
+* Simulate real system operation guidance
+
+---
+
+## ❗ System Identity (VERY IMPORTANT)
+
+This project is:
+
+✅ A step-by-step operation guidance engine
+❌ NOT a chatbot
+❌ NOT a RAG system
+❌ NOT a general AI assistant
+❌ NOT a workflow automation platform
+
+---
+
+## ⚙️ Tech Stack (STRICT & MANDATORY)
+
+### Backend
+
+* Python == 3.11.9
+* Poetry (dependency management ONLY)
+* FastAPI (web framework ONLY)
+
+### Frontend
+
+* Vue 3
+* Vite
+* Composition API ONLY
+
+---
+
+## 🚨 Core Engineering Principles
+
+1. **Simplicity First**
+2. **Working > Perfect**
+3. **Explicit > Abstract**
+4. **Hardcode > Over-engineering**
+5. **MVP > Platform**
+
+---
+
+## 🏗️ Architecture Rules (STRICT)
+
+The system must follow this pipeline:
+
+User Input
+→ Intent Detection (rule-based)
+→ Load YAML Task
+→ Step Engine (based on state)
+→ Response Generator
+
+---
+
+## 🧠 Agent Behavior Rules
+
+The system must:
+
+1. Accept user input (text)
+2. Detect intent using RULE-BASED logic ONLY
+3. Load corresponding YAML workflow
+4. Determine current step based on UI state
+5. Return next actionable step
+
+---
+
+## ❌ Forbidden Technologies (DO NOT USE)
+
+* LangChain
+* LangGraph
+* LLM frameworks
+* Vector databases
+* Embeddings
+* RAG pipelines
+* OpenAPI parsing
+* Auto schema generation
+* Multi-agent systems
+
+---
+
+## 📚 YAML Workflow Rules
+
+YAML must follow STRICT structure:
+
+```yaml
+task:
+  id: string
+  name: string
+
+steps:
+  - step: number
+    page: string (optional)
+    action: string (optional)
+    form: (optional)
+```
+
+### Rules:
+
+* Keep YAML human-readable
+* No dynamic schema
+* No nesting beyond 2 levels
+* No logic inside YAML
+* YAML = data only
+
+---
+
+## 🧩 Backend Rules
+
+### General
+
+* Use Poetry ONLY (no pip / requirements.txt)
+* Keep files small (<200 lines)
+* Prefer functions over classes
+* Avoid deep abstractions
+
+---
+
+### Required Modules
+
+```
+agent/
+  intent.py      # intent detection
+  engine.py      # step logic
+  state.py       # UI state handling
+  responder.py   # output formatting
+```
+
+---
+
+### Coding Rules
+
+* No unnecessary classes
+* No dependency injection frameworks
+* No design patterns unless absolutely necessary
+* Use plain Python
+
+---
+
+## 🧠 Intent Detection Rules
+
+* MUST be rule-based
+* DO NOT use AI / LLM
+* Use simple keyword matching
+
+Example:
+
+```python
+if "开卡" in text:
+    return "open_account"
+```
+
+---
+
+## 🔄 Step Engine Rules
+
+* Must be deterministic
+* Must not hallucinate
+* Must rely ONLY on:
+
+  * YAML
+  * current state
+
+---
+
+## 🖥️ UI State Rules
+
+State example:
+
+```json
+{
+  "current_page": "/customer"
+}
+```
+
+Rules:
+
+* Always trust state input
+* Never infer hidden UI
+* Never hallucinate buttons/pages
+
+---
+
+## 🗣️ Response Rules (CRITICAL)
+
+Responses must:
+
+✅ Be actionable
+✅ Be step-by-step
+✅ Tell user EXACTLY what to do
+
+---
+
+### Good Example
+
+👉 当前页面：客户管理
+
+建议下一步：
+点击【开户】
+
+原因：
+这是开户流程的下一步
+
+---
+
+### Bad Example
+
+❌ “你可以去开户页面完成操作”
+❌ “系统支持开户功能”
+
+---
+
+## 🎨 Frontend Rules
+
+### MUST
+
+* Use Vue3 Composition API
+* Keep UI minimal
+* Single main component: ChatPanel
+
+---
+
+### UI Requirements
+
+* Input box (user message)
+* Display response
+* Display current step
+* Display current page (optional)
+
+---
+
+### DO NOT
+
+* Use complex UI frameworks
+* Build dashboard systems
+* Add unnecessary components
+
+---
+
+## 🔄 Development Workflow (STRICT ORDER)
+
+1. Build CLI version FIRST
+2. Validate logic works
+3. Build FastAPI endpoint
+4. THEN build Vue frontend
+
+---
+
+## 🧪 Testing Rules
+
+* Test intent detection
+* Test step engine
+* At least 1 test per module
+
+---
+
+## 🧠 Decision Rules (VERY IMPORTANT)
+
+If unsure:
+
+* simple > complex
+* explicit > abstract
+* hardcoded > dynamic
+* working > clean
+
+---
+
+## 🚫 Anti-Overengineering Rules
+
+DO NOT:
+
+* Create generic frameworks
+* Abstract future features
+* Add plugin systems
+* Build reusable engines
+
+---
+
+## 🔒 Scope Control (CRITICAL)
+
+ONLY build:
+
+* Open Account workflow
+* Basic step guidance
+
+STOP after MVP works.
+
+---
+
+## 🔥 Final Principle
+
+You are NOT building a platform.
+
+You are building a **working demo in the shortest time possible**.
+
+---
+
+## 🧭 Success Definition
+
+The project is successful if:
+
+* User inputs: “我要开卡”
+* System responds with correct next step
+* Guidance feels like a human trainer
+
+---
+
+## 🧨 Absolute Rule
+
+If a feature is NOT required for MVP:
+
+👉 DO NOT IMPLEMENT IT
