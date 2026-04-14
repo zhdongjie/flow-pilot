@@ -1,11 +1,10 @@
-export async function sendChat(message, currentPage) {
+export async function sendChat(message, currentPage, currentStep) {
   const payload = {
     message,
-    state: {},
+    current_page: currentPage || "",
   };
-
-  if (currentPage) {
-    payload.state.current_page = currentPage;
+  if (typeof currentStep === "number") {
+    payload.current_step = currentStep;
   }
 
   const response = await fetch("/chat", {

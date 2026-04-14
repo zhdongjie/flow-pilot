@@ -22,10 +22,36 @@ def load_task(task_id: str) -> dict[str, Any]:
     return validate_task(data)
 
 
-def get_next_step(task: dict[str, Any], state: dict[str, Any] | None) -> dict[str, Any] | None:
+def _state_matches(step_state: Any, state: dict[str, Any] | None) -> bool:
+    if not isinstance(step_state, dict):
+        return True
+    if not state:
+        return True
+    for key, expected in step_state.items():
+        if key not in state:
+            continue
+        if state.get(key) != expected:
+            return False
+    return True
+
+
+def get_next_step(
+    task: dict[str, Any],
+    state: dict[str, Any] | None,
+    current_step: int | None = None,
+) -> dict[str, Any] | None:
     steps = task.get("steps") or []
     if not steps:
         return None
+
+    if current_step is not None:
+        for idx, step in enumerate(steps):
+            step_no = step.get("step")
+            if step_no == current_step:
+                for next_step in steps[idx + 1 :]:
+                    if _state_matches(next_step.get("state"), state):
+                        return next_step
+                return None
 
     current_page = None
     if state:
@@ -33,7 +59,13 @@ def get_next_step(task: dict[str, Any], state: dict[str, Any] | None) -> dict[st
 
     if current_page:
         for step in steps:
-            if step.get("page") == current_page:
+            if step.get("page") == current_page and _state_matches(
+                step.get("state"), state
+            ):
                 return step
+
+    for step in steps:
+        if _state_matches(step.get("state"), state):
+            return step
 
     return steps[0]

@@ -9,7 +9,7 @@ import uvicorn
 
 from app.agent.engine import get_next_step, load_task
 from app.agent.intent import detect_intent
-from app.agent.responder import format_reply
+from app.agent.responder import build_action_text, format_reply
 from app.agent.state import get_current_page
 
 
@@ -20,10 +20,17 @@ class StatePayload(BaseModel):
     current_page: str | None = Field(
         default=None, description="当前页面路径，例如 /customer"
     )
+    auth: str | None = Field(default=None, description="认证状态，例如 authenticated")
 
 
 class ChatRequest(BaseModel):
     message: str = Field(..., description="用户输入的意图文本，例如 我要开户")
+    current_page: str | None = Field(
+        default=None, description="当前页面路径（可选）"
+    )
+    current_step: int | None = Field(
+        default=None, description="当前已完成的步骤编号（可选）"
+    )
     state: StatePayload | None = Field(
         default=None, description="页面状态信息（可选）"
     )
@@ -38,14 +45,20 @@ class StepPayload(BaseModel):
     step: int | None = Field(default=None, description="步骤编号")
     page: str | None = Field(default=None, description="目标页面路径")
     action: str | None = Field(default=None, description="建议动作")
+    highlight: str | None = Field(default=None, description="高亮目标标识")
+    desc: str | None = Field(default=None, description="步骤说明")
     form: list[FormFieldPayload] | None = Field(
         default=None, description="需要填写的表单字段"
     )
 
 
 class ChatResponse(BaseModel):
-    reply: str = Field(..., description="可直接展示的引导话术")
-    intro: str = Field(..., description="引导简介，用于页面提示")
+    reply: str = Field(..., description="完整流程 + 下一步引导话术")
+    message: str = Field(..., description="简短指令文案")
+    highlight: str | None = Field(
+        default=None, description="需要高亮的 UI 元素标识"
+    )
+    reason: str = Field(..., description="给出该步骤的原因说明")
     next_step: StepPayload | None = Field(
         default=None, description="下一步结构化信息"
     )
@@ -88,9 +101,15 @@ def _normalize_state(state: Any) -> dict[str, Any]:
 
     current_page = get_current_page(state)
     if current_page:
-        return {"current_page": current_page}
+        normalized: dict[str, Any] = {"current_page": current_page}
+    else:
+        normalized = {}
 
-    return {}
+    auth = state.get("auth")
+    if isinstance(auth, str) and auth.strip():
+        normalized["auth"] = auth
+
+    return normalized
 
 
 def _dump_state(state: StatePayload | None) -> dict[str, Any]:
@@ -109,17 +128,6 @@ def _build_step_payload(step: dict[str, Any] | None) -> StepPayload | None:
     return StepPayload.parse_obj(step)  # type: ignore[attr-defined]
 
 
-def _build_intro(step: dict[str, Any] | None, state: dict[str, Any] | None) -> str:
-    page = state.get("current_page") if state else None
-    page_label = page or "未知页面"
-    if step is None:
-        return "未找到可执行步骤，请确认流程配置。"
-    action = step.get("action") or "继续执行下一步操作"
-    step_page = step.get("page")
-    if step_page and step_page != page_label:
-        return f"当前页面：{page_label}，建议前往 {step_page} 并执行：{action}。"
-    return f"当前页面：{page_label}，建议执行：{action}。"
-
 
 @app.post("/chat", response_model=ChatResponse, summary="开户引导对话接口")
 def chat(payload: ChatRequest) -> ChatResponse:
@@ -127,16 +135,23 @@ def chat(payload: ChatRequest) -> ChatResponse:
     if not message:
         return ChatResponse(
             reply="未输入内容。",
-            intro="请输入意图，例如：我要开户。",
+            message="请输入意图，例如：我要开卡。",
+            highlight=None,
+            reason="未收到有效输入。",
             next_step=None,
         )
 
-    state = _normalize_state(_dump_state(payload.state))
+    state_payload = _dump_state(payload.state)
+    if payload.current_page:
+        state_payload["current_page"] = payload.current_page
+    state = _normalize_state(state_payload)
     intent = detect_intent(message)
     if intent == "unknown":
         return ChatResponse(
             reply="未识别意图。",
-            intro="可以尝试输入：我要开户。",
+            message="可以尝试输入：我要开卡。",
+            highlight=None,
+            reason="当前仅支持开户流程。",
             next_step=None,
         )
 
@@ -145,17 +160,45 @@ def chat(payload: ChatRequest) -> ChatResponse:
     except FileNotFoundError:
         return ChatResponse(
             reply="未找到对应流程。",
-            intro="请确认流程文件是否存在。",
+            message="流程未配置，请检查流程文件。",
+            highlight=None,
+            reason="缺少对应的流程定义。",
             next_step=None,
         )
 
-    step = get_next_step(task, state)
+    step = get_next_step(task, state, payload.current_step)
     reply = format_reply(task, step, state)
-    intro = _build_intro(step, state)
+
+    if step is None:
+        return ChatResponse(
+            reply=reply,
+            message="流程已完成。",
+            highlight=None,
+            reason="已完成全部步骤。",
+            next_step=None,
+        )
+
+    action_text = ""
+    if isinstance(step.get("action"), str) and step.get("action").strip():
+        action_text = step.get("action").strip()
+    else:
+        action_text = build_action_text(step)
+    message_text = action_text if action_text else "请继续完成流程。"
+    reason_text = (
+        step.get("desc")
+        if isinstance(step.get("desc"), str) and step.get("desc").strip()
+        else "这是开户流程的下一步。"
+    )
+    highlight_key = None
+    highlight_value = step.get("highlight")
+    if isinstance(highlight_value, str) and highlight_value.strip():
+        highlight_key = highlight_value
 
     return ChatResponse(
         reply=reply,
-        intro=intro,
+        message=message_text,
+        highlight=highlight_key,
+        reason=reason_text,
         next_step=_build_step_payload(step),
     )
 

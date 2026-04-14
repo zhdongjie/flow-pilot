@@ -19,10 +19,10 @@
         <div class="page-screen">
           <Transition name="page" mode="out-in">
             <section v-if="activePage === 'login'" key="login" class="page login-page">
-            <div class="panel">
+            <div class="panel wide" data-guide-id="ui.form_login">
               <h2>安全登录</h2>
               <p>请输入您的登录信息，进入客户服务中心。</p>
-              <div class="form-grid">
+              <form class="form-grid dense" @submit.prevent>
                 <label>
                   手机号
                   <input
@@ -39,18 +39,19 @@
                     placeholder="短信验证码"
                   />
                 </label>
-              </div>
-              <div class="action-row">
+              </form>
+              <div class="form-actions">
                 <button
                   class="primary"
                   type="button"
+                  data-guide-id="ui.btn_login"
                   :disabled="loginLoading"
                   @click="handleLogin"
                 >
                   {{ loginLoading ? "登录中..." : "登录进入" }}
                 </button>
-                <p v-if="loginMessage" class="inline-status">{{ loginMessage }}</p>
               </div>
+              <p v-if="loginMessage" class="inline-status">{{ loginMessage }}</p>
             </div>
             <div class="info-panel">
               <h3>登录提示</h3>
@@ -71,6 +72,7 @@
                   :class="{ active: activeMenu === 'overview' }"
                   role="button"
                   tabindex="0"
+                  data-guide-id="ui.menu_overview"
                   @click="selectMenu('overview')"
                 >
                   <p>账户概览</p>
@@ -81,6 +83,7 @@
                   :class="{ active: activeMenu === 'open' }"
                   role="button"
                   tabindex="0"
+                  data-guide-id="ui.menu_open_account"
                   @click="selectMenu('open')"
                 >
                   <p>开户申请</p>
@@ -91,6 +94,7 @@
                   :class="{ active: activeMenu === 'profile' }"
                   role="button"
                   tabindex="0"
+                  data-guide-id="ui.menu_profile"
                   @click="selectMenu('profile')"
                 >
                   <p>资料管理</p>
@@ -101,6 +105,7 @@
                   :class="{ active: activeMenu === 'funds' }"
                   role="button"
                   tabindex="0"
+                  data-guide-id="ui.menu_funds"
                   @click="selectMenu('funds')"
                 >
                   <p>资金服务</p>
@@ -114,7 +119,7 @@
             </div>
             </section>
             <section v-else key="form" class="page form-page">
-            <div class="panel wide">
+            <div class="panel wide" data-guide-id="ui.form_open_account">
               <h2>开户申请表单</h2>
               <p>请完整填写开户信息，提交后进入审核流程。</p>
               <form class="form-grid dense" @submit.prevent>
@@ -171,6 +176,7 @@
                 <button
                   class="primary"
                   type="button"
+                  data-guide-id="ui.btn_submit_application"
                   :disabled="formLoading"
                   @click="handleSubmit"
                 >
@@ -190,63 +196,11 @@
     </div>
   </div>
 
-  <button class="chat-fab" type="button" @click="toggleChat">
-    在线客服
-  </button>
-
-  <Transition name="chat">
-    <div v-if="chatOpen" class="chat-window floating" role="dialog">
-      <header class="chat-header">
-        <div>
-          <p class="chat-title">智能客服</p>
-          <span class="chat-subtitle">开户引导助手</span>
-        </div>
-        <button class="icon" type="button" @click="toggleChat">×</button>
-      </header>
-
-      <div ref="chatBody" class="chat-body">
-        <div
-          v-for="item in messages"
-          :key="item.id"
-          :class="['chat-bubble', item.role]"
-        >
-          <span class="role">{{ item.role === 'assistant' ? '客服' : '我' }}</span>
-          <p>{{ item.text }}</p>
-        </div>
-        <div v-if="chatLoading" class="chat-bubble assistant">
-          <span class="role">客服</span>
-          <p>正在为你解析意图...</p>
-        </div>
-      </div>
-
-      <form class="chat-input" @submit.prevent="sendMessage">
-        <input
-          v-model="chatInput"
-          type="text"
-          placeholder="例如：我要开户"
-          autocomplete="off"
-        />
-        <button type="submit" :disabled="chatLoading">发送</button>
-      </form>
-
-      <p v-if="messages.length" class="chat-footnote">
-        当前页面：{{ currentPageLabel }}
-      </p>
-      <p v-if="chatError" class="chat-error">{{ chatError }}</p>
-    </div>
-  </Transition>
 </template>
 
 <script setup>
-import { computed, nextTick, ref } from "vue";
-import { sendChat } from "../api/chat";
+import { ref } from "vue";
 import { login, submitOpenAccount } from "../api/bank";
-
-const pages = [
-  { key: "login", label: "登录页", pageId: "/home" },
-  { key: "menu", label: "用户中心", pageId: "/customer" },
-  { key: "form", label: "开户申请", pageId: "/customer/create" },
-];
 
 const activePage = ref("login");
 const activeMenu = ref("");
@@ -263,21 +217,6 @@ const formAddress = ref("");
 const formNote = ref("");
 const formLoading = ref(false);
 const formMessage = ref("");
-
-const chatOpen = ref(false);
-const chatInput = ref("");
-const chatLoading = ref(false);
-const chatError = ref("");
-const chatBody = ref(null);
-
-let messageId = 1;
-const messages = ref([]);
-
-const currentPage = computed(() => pages.find((page) => page.key === activePage.value));
-
-const currentPageLabel = computed(() => currentPage.value?.label || "未知页面");
-
-const currentPagePath = computed(() => currentPage.value?.pageId || "-");
 
 const goToMenu = () => {
   activePage.value = "menu";
@@ -300,51 +239,7 @@ const resetDemo = () => {
   formAddress.value = "";
   formNote.value = "";
   formMessage.value = "";
-  chatError.value = "";
-  messages.value = [];
   activeMenu.value = "";
-};
-
-const toggleChat = () => {
-  chatOpen.value = !chatOpen.value;
-  chatError.value = "";
-  if (chatOpen.value) {
-    nextTick(() => {
-      if (chatBody.value) {
-        chatBody.value.scrollTop = chatBody.value.scrollHeight;
-      }
-    });
-  }
-};
-
-const pushMessage = (role, text) => {
-  messages.value.push({ id: messageId++, role, text });
-  nextTick(() => {
-    if (chatBody.value) {
-      chatBody.value.scrollTop = chatBody.value.scrollHeight;
-    }
-  });
-};
-
-const sendMessage = async () => {
-  const text = chatInput.value.trim();
-  if (!text || chatLoading.value) {
-    return;
-  }
-  chatError.value = "";
-  chatInput.value = "";
-  pushMessage("user", text);
-
-  chatLoading.value = true;
-  try {
-    const data = await sendChat(text, currentPagePath.value);
-    pushMessage("assistant", data.reply || "已收到，请继续。");
-  } catch (err) {
-    chatError.value = "请求失败，请确认后端服务已启动。";
-    pushMessage("assistant", "我暂时无法连接系统，请稍后再试。");
-  } finally {
-    chatLoading.value = false;
-  }
 };
 
 const selectMenu = (key) => {

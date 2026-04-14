@@ -3,14 +3,15 @@
 from typing import Any
 
 
-def _build_action_text(step: dict[str, Any]) -> str:
+def build_action_text(step: dict[str, Any]) -> str:
+    action_text = ""
     action = step.get("action")
     if isinstance(action, str) and action.strip():
-        return action
+        action_text = action.strip()
 
     form = step.get("form")
+    fields: list[str] = []
     if isinstance(form, list) and form:
-        fields: list[str] = []
         for item in form:
             if not isinstance(item, dict):
                 continue
@@ -22,14 +23,19 @@ def _build_action_text(step: dict[str, Any]) -> str:
                 fields.append(desc)
             elif isinstance(field, str):
                 fields.append(field)
-        if fields:
-            return "填写表单：" + "，".join(fields)
+
+    if action_text and fields:
+        return f"{action_text}（填写：{'，'.join(fields)}）"
+    if action_text:
+        return action_text
+    if fields:
+        return "填写表单：" + "，".join(fields)
 
     return "执行下一步操作"
 
 
 def _format_step_line(step: dict[str, Any]) -> str:
-    action_text = _build_action_text(step)
+    action_text = build_action_text(step)
     page = step.get("page")
     if isinstance(page, str) and page.strip():
         return f"{action_text}（{page}）"
@@ -42,7 +48,7 @@ def format_reply(
     state: dict[str, Any] | None,
 ) -> str:
     steps = task.get("steps") or []
-    if not steps or step is None:
+    if not steps:
         return "未找到可执行步骤。"
 
     current_page = "未知"
@@ -50,8 +56,6 @@ def format_reply(
         page = state.get("current_page")
         if isinstance(page, str) and page.strip():
             current_page = page
-
-    action_text = _build_action_text(step)
 
     step_lines: list[str] = []
     for item in steps:
@@ -62,6 +66,23 @@ def format_reply(
             step_lines.append(f"{step_no}. {_format_step_line(item)}")
         else:
             step_lines.append(f"- {_format_step_line(item)}")
+
+    if step is None:
+        lines = [
+            f"当前页面：{current_page}",
+            "",
+            "完整流程：",
+            *step_lines,
+            "",
+            "建议下一步：",
+            "流程已完成。",
+            "",
+            "原因：",
+            "已完成全部步骤。",
+        ]
+        return "\n".join(lines)
+
+    action_text = build_action_text(step)
 
     lines = [
         f"当前页面：{current_page}",

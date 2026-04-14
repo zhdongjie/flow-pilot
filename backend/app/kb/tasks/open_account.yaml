@@ -5,14 +5,40 @@
 steps:
   - step: 1
     page: /home
-    action: 完成登录进入客户服务中心
+    state:
+      auth: unauthenticated
+    action: 填写登录信息
+    highlight: ui.form_login
+    desc: 输入手机号与验证码
+    form:
+      - field: phone
+        desc: 手机号
+      - field: code
+        desc: 验证码
 
   - step: 2
-    page: /customer
-    action: 进入开户申请
+    page: /home
+    state:
+      auth: unauthenticated
+    action: 点击【登录进入】
+    highlight: ui.btn_login
+    desc: 登录后进入客户服务中心
 
   - step: 3
+    page: /customer
+    state:
+      auth: authenticated
+    action: 点击【开户申请】
+    highlight: ui.menu_open_account
+    desc: 进入开户申请表单页面
+
+  - step: 4
     page: /customer/create
+    state:
+      auth: authenticated
+    action: 填写开户申请表单
+    highlight: ui.form_open_account
+    desc: 依次填写客户信息与风险等级
     form:
       - field: name
         desc: 客户姓名
@@ -27,6 +53,10 @@ steps:
       - field: note
         desc: 备注
 
-  - step: 4
+  - step: 5
     page: /customer/create
-    action: 点击提交申请
+    state:
+      auth: authenticated
+    action: 点击【提交申请】
+    highlight: ui.btn_submit_application
+    desc: 提交后进入审核流程
