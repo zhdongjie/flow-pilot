@@ -260,6 +260,12 @@ const handleLogin = async () => {
     loginMessage.value = "请输入手机号和验证码。";
     return;
   }
+
+  const FlowPilot = window.FlowPilot;
+  if (FlowPilot && typeof FlowPilot.next === "function") {
+    FlowPilot.next();
+    FlowPilot.next();
+  }
   loginLoading.value = true;
   try {
     const data = await login(phone, code);
@@ -280,6 +286,12 @@ const handleSubmit = async () => {
   if (!formName.value.trim() || !formIdCard.value.trim()) {
     formMessage.value = "请至少填写姓名和身份证号。";
     return;
+  }
+
+  const FlowPilot = window.FlowPilot;
+  if (FlowPilot && typeof FlowPilot.next === "function") {
+    FlowPilot.next();
+    FlowPilot.next();
   }
   formLoading.value = true;
   try {
